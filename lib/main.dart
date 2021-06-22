@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_wikispy/database_helper.dart';
 import 'package:flutter_wikispy/screens/login_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await DatabaseHelper.setupDatabase();
   runApp(MyApp());
 }
 

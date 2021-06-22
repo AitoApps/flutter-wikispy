@@ -1,12 +1,13 @@
 import 'package:dio/dio.dart';
 
-class WikispyService {
-  WikispyService({required Dio client}) : _client = client;
+class WikiAdsService {
+  WikiAdsService({required Dio client}) : _client = client;
   final Dio _client;
+  final _base = "https://wikispy.com";
 
   getAds() async {
     try {
-      final response = await _client.get('');
+      final response = await _client.get('/ads');
       if (response.statusCode != 200) {
         //throw exceptionn
       }
