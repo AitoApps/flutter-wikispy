@@ -53,6 +53,7 @@ class AuthenticationBloc
         return user != null
             ? AuthenticationState.authenticated(user)
             : const AuthenticationState.unauthenticated();
+      // return AuthenticationState.authenticated(User.empty);
       default:
         return const AuthenticationState.unknown();
     }

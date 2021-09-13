@@ -27,6 +27,9 @@ class DatabaseHelper {
 
   static Future<String?> getUserToken() async {
     final userBox = await Hive.openBox<User>(_userTable);
-    return userBox.getAt(0)?.token;
+    if (userBox.isNotEmpty) {
+      return userBox.getAt(0)?.token;
+    }
+    return null;
   }
 }

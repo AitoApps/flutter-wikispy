@@ -14,18 +14,29 @@ class AuthenticationRepository {
 
   Stream<AuthenticationStatus> get status async* {
     await Future<void>.delayed(Duration(seconds: 1));
-    yield AuthenticationStatus.authenticated;
+    yield AuthenticationStatus.unauthenticated;
     yield* _controller.stream;
   }
 
   Future<void> logIn({required String email, required String password}) async {
     final creds = {"email": email, "password": password};
-    _wikiAuthService.logIn(creds: creds);
-    _controller.add(AuthenticationStatus.authenticated);
-    // await Future.delayed(
-    //   Duration(milliseconds: 300),
-    //   () => _controller.add(AuthenticationStatus.authenticated),
-    // );
+    final data = await _wikiAuthService.logIn(creds: creds);
+
+    if (data != null) {
+      if (data['message'] == "success") {
+        //get user info;
+        final user = await _wikiAuthService.getUser(token: data['token']);
+        print("Redoine userwithtoken: $user");
+        //save user info
+        DatabaseHelper.clearUser();
+        DatabaseHelper.addUser(user);
+        _controller.add(AuthenticationStatus.authenticated);
+      } else {
+        _controller.add(AuthenticationStatus.unauthenticated);
+      }
+    } else {
+      _controller.add(AuthenticationStatus.unauthenticated);
+    }
   }
 
   void logOut() {
@@ -36,11 +47,13 @@ class AuthenticationRepository {
   Future<User?> tryGetUser() async {
     //get token from storage
     final token = await DatabaseHelper.getUserToken();
+    print("token: $token");
     if (token == null) return null;
     try {
       final user = await _wikiAuthService.getUser(token: token);
       return user;
-    } on Exception {
+    } on Exception catch (e) {
+      print(e);
       return null;
     }
   }
